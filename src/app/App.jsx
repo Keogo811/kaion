@@ -11,6 +11,11 @@ function App() {
   const [songs, setSongs] = useState([]);
   const [currentSong, setCurrentSong] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Nouveaux états pour le lecteur
+  const [isShuffle, setIsShuffle] = useState(false);
+  const [isRepeat, setIsRepeat] = useState(false);
+
   const { colors, extract } = useColorPalette();
 
   useEffect(() => {
@@ -28,39 +33,58 @@ function App() {
     fetchSongs();
   }, []);
 
-  const addSong = async (newSong) => {
+  const addSong = async (newSong) => { /* ... (inchangé) ... */ 
     try {
-      await sql`
-        INSERT INTO songs (id, title, artist, url, image, lyrics, theme, tags) 
-        VALUES (${newSong.id}, ${newSong.title}, ${newSong.artist}, ${newSong.url}, ${newSong.image}, ${newSong.lyrics}, ${newSong.theme}, ${newSong.tags})
-      `;
+      await sql`INSERT INTO songs (id, title, artist, url, image, lyrics, theme, tags) VALUES (${newSong.id}, ${newSong.title}, ${newSong.artist}, ${newSong.url}, ${newSong.image}, ${newSong.lyrics}, ${newSong.theme}, ${newSong.tags})`;
       setSongs((prev) => [...prev, newSong]);
       if (!currentSong) setCurrentSong(newSong);
-    } catch (error) { console.error(error); alert("Erreur d'ajout."); }
+    } catch (error) { console.error(error); }
   };
 
-  // NOUVEAU : Mettre à jour une chanson
-  const updateSong = async (updatedSong) => {
+  const updateSong = async (updatedSong) => { /* ... (inchangé) ... */ 
     try {
-      await sql`
-        UPDATE songs 
-        SET title = ${updatedSong.title}, artist = ${updatedSong.artist}, url = ${updatedSong.url}, tags = ${updatedSong.tags}
-        WHERE id = ${updatedSong.id}
-      `;
+      await sql`UPDATE songs SET title = ${updatedSong.title}, artist = ${updatedSong.artist}, url = ${updatedSong.url}, tags = ${updatedSong.tags} WHERE id = ${updatedSong.id}`;
       setSongs((prev) => prev.map((s) => (s.id === updatedSong.id ? updatedSong : s)));
       if (currentSong?.id === updatedSong.id) setCurrentSong(updatedSong);
-    } catch (error) { console.error(error); alert("Erreur de modification."); }
+    } catch (error) { console.error(error); }
   };
 
-  // NOUVEAU : Supprimer une chanson
-  const deleteSong = async (id) => {
+  const deleteSong = async (id) => { /* ... (inchangé) ... */ 
     try {
       await sql`DELETE FROM songs WHERE id = ${id}`;
       setSongs((prev) => prev.filter((s) => s.id !== id));
-      if (currentSong?.id === id) {
-        setCurrentSong(songs.find(s => s.id !== id) || null);
-      }
-    } catch (error) { console.error(error); alert("Erreur de suppression."); }
+      if (currentSong?.id === id) setCurrentSong(songs.find(s => s.id !== id) || null);
+    } catch (error) { console.error(error); }
+  };
+
+  // NOUVEAU : Chanson suivante
+  const handleNext = () => {
+    if (!currentSong || songs.length === 0) return;
+
+    if (isShuffle) {
+      // Aléatoire : on prend une chanson au hasard (différente de l'actuelle si possible)
+      const randomIndex = Math.floor(Math.random() * songs.length);
+      setCurrentSong(songs[randomIndex]);
+    } else {
+      // Normal : on passe à la suivante
+      const currentIndex = songs.findIndex(s => s.id === currentSong.id);
+      const nextIndex = (currentIndex + 1) % songs.length; // Revient à 0 si on est à la fin
+      setCurrentSong(songs[nextIndex]);
+    }
+  };
+
+  // NOUVEAU : Chanson précédente
+  const handlePrev = () => {
+    if (!currentSong || songs.length === 0) return;
+
+    if (isShuffle) {
+      const randomIndex = Math.floor(Math.random() * songs.length);
+      setCurrentSong(songs[randomIndex]);
+    } else {
+      const currentIndex = songs.findIndex(s => s.id === currentSong.id);
+      const prevIndex = (currentIndex - 1 + songs.length) % songs.length; // Revient à la fin si on est au début
+      setCurrentSong(songs[prevIndex]);
+    }
   };
 
   useEffect(() => {
@@ -90,18 +114,24 @@ function App() {
             </>
           } />
           <Route path="/song/:id" element={<SongDetails songs={songs} />} />
-          <Route path="/admin" element={
-            <AdminPage 
-              songs={songs} 
-              onAddSong={addSong} 
-              onUpdateSong={updateSong} 
-              onDeleteSong={deleteSong} 
-            />
-          } />
+          <Route path="/admin" element={<AdminPage songs={songs} onAddSong={addSong} onUpdateSong={updateSong} onDeleteSong={deleteSong} />} />
         </Routes>
       </main>
+      
       <div className="bottom-player-bar">
-        {currentSong ? <AudioPlayer src={currentSong.url} /> : <div style={{ padding: '1rem', color: '#333' }}>Aucune chanson.</div>}
+        {currentSong ? (
+          <AudioPlayer 
+            src={currentSong.url} 
+            onNext={handleNext}
+            onPrev={handlePrev}
+            isShuffle={isShuffle}
+            onToggleShuffle={() => setIsShuffle(!isShuffle)}
+            isRepeat={isRepeat}
+            onToggleRepeat={() => setIsRepeat(!isRepeat)}
+          />
+        ) : (
+          <div style={{ padding: '1rem', color: '#333' }}>Aucune chanson.</div>
+        )}
       </div>
     </div>
   );

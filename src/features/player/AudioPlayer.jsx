@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 
-function AudioPlayer({ src }) {
+function AudioPlayer({ src, onNext, onPrev, isShuffle, onToggleShuffle, isRepeat, onToggleRepeat }) {
   const audioRef = useRef(null);
   
   const [isPlaying, setIsPlaying] = useState(false);
@@ -8,29 +8,28 @@ function AudioPlayer({ src }) {
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
 
-  // Si la source (src) change, on réinitialise le lecteur
   useEffect(() => {
     setIsPlaying(false);
     setCurrentTime(0);
     setDuration(0);
     if (audioRef.current) {
-      audioRef.current.load(); // Force le navigateur à recharger la nouvelle source
+      audioRef.current.load();
     }
   }, [src]);
 
-  const handleTimeUpdate = () => {
-    setCurrentTime(audioRef.current.currentTime);
-  };
+  const handleTimeUpdate = () => setCurrentTime(audioRef.current.currentTime);
+  const handleLoadedMetadata = () => setDuration(audioRef.current.duration);
 
-  const handleLoadedMetadata = () => {
-    setDuration(audioRef.current.duration);
-    // Optionnel : lancer la musique automatiquement au changement
-    // audioRef.current.play(); setIsPlaying(true);
-  };
-
+  // Gestion de la fin de chanson
   const handleEnded = () => {
-    setIsPlaying(false);
-    setCurrentTime(0);
+    if (isRepeat) {
+      // Si la boucle est activée, on rejoue la même
+      audioRef.current.play();
+    } else {
+      // Sinon, on passe à la suivante
+      setIsPlaying(false);
+      if (onNext) onNext();
+    }
   };
 
   const togglePlay = () => {
@@ -63,7 +62,7 @@ function AudioPlayer({ src }) {
   };
 
   return (
-    <div style={{ padding: '1rem', width: '100%', maxWidth: '600px', margin: '0 auto' }}>
+    <div style={{ padding: '0.5rem 1rem', width: '100%', maxWidth: '600px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
       <audio 
         ref={audioRef} 
         src={src} 
@@ -73,18 +72,44 @@ function AudioPlayer({ src }) {
         onEnded={handleEnded}
       />
 
-      <button onClick={togglePlay} style={{ padding: '0.5rem 1rem', fontSize: '1rem', cursor: 'pointer', marginBottom: '1rem' }}>
-        {isPlaying ? '⏸ Pause' : '▶ Play'}
-      </button>
+      {/* Boutons de contrôle principaux */}
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem' }}>
+        {/* Bouton Aléatoire */}
+        <button onClick={onToggleShuffle} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: isShuffle ? '#007bff' : '#888' }} title="Aléatoire">
+          🔀
+        </button>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
-        <span style={{ fontSize: '0.8rem', color: '#666', width: '35px' }}>{formatTime(currentTime)}</span>
+        {/* Précédent */}
+        <button onClick={onPrev} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#333' }} title="Précédent">
+          ⏮
+        </button>
+
+        {/* Play / Pause */}
+        <button onClick={togglePlay} style={{ padding: '0.5rem 1rem', fontSize: '1.2rem', cursor: 'pointer', backgroundColor: '#333', color: '#fff', border: 'none', borderRadius: '50%', width: '50px', height: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {isPlaying ? '⏸' : '▶'}
+        </button>
+
+        {/* Suivant */}
+        <button onClick={onNext} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#333' }} title="Suivant">
+          ⏭
+        </button>
+
+        {/* Bouton Boucle */}
+        <button onClick={onToggleRepeat} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: isRepeat ? '#007bff' : '#888' }} title="Boucle">
+          🔁
+        </button>
+      </div>
+
+      {/* Barre de progression */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <span style={{ fontSize: '0.8rem', color: '#666', width: '35px', textAlign: 'right' }}>{formatTime(currentTime)}</span>
         <input type="range" min="0" max={duration || 0} value={currentTime} onChange={handleSeek} style={{ flex: 1, cursor: 'pointer' }} />
         <span style={{ fontSize: '0.8rem', color: '#666', width: '35px' }}>{formatTime(duration)}</span>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <span style={{ fontSize: '1rem' }}>🔊</span>
+      {/* Volume */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', maxWidth: '200px', margin: '0 auto' }}>
+        <span style={{ fontSize: '0.9rem' }}>🔊</span>
         <input type="range" min="0" max="1" step="0.01" value={volume} onChange={handleVolumeChange} style={{ flex: 1, cursor: 'pointer' }} />
       </div>
     </div>

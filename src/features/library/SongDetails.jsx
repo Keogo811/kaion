@@ -30,7 +30,20 @@ function SongDetails() {
       
       <div style={{ marginTop: '2rem', padding: '1.5rem', backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)' }}>
         <h4 style={{ textShadow: '0px 1px 3px rgba(0,0,0,0.8)' }}>Paroles :</h4>
-        <p style={{ textShadow: '0px 1px 3px rgba(0,0,0,0.8)' }}><em>Les paroles de cette chanson seront disponibles plus tard.</em></p>
+        
+        {/* Affichage conditionnel des paroles */}
+        {song.lyrics ? (
+          <p style={{ 
+            whiteSpace: 'pre-wrap', // TRÈS IMPORTANT : Permet de garder les sauts de ligne du texte
+            lineHeight: '1.6',
+            fontSize: '1.1rem',
+            textShadow: '0px 1px 3px rgba(0,0,0,0.8)'
+          }}>
+            {song.lyrics}
+          </p>
+        ) : (
+          <p style={{ fontStyle: 'italic', opacity: 0.7 }}>Aucune parole n'est disponible pour cette chanson.</p>
+        )}
       </div>
     </div>
   );

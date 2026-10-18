@@ -11,8 +11,8 @@ function SongList({ onSongSelect }) {
             key={song.id} 
             style={{ 
               padding: '1rem', 
-              borderBottom: '1px solid #ddd',
-              backgroundColor: 'rgba(255, 255, 255, 0.1)', // Fond semi-transparent pour s'adapter à tous les thèmes
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
               marginBottom: '0.5rem',
               borderRadius: '8px',
               display: 'flex',

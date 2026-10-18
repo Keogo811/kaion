@@ -39,7 +39,7 @@ function App() {
       }}
     >
       <main className="main-content">
-        <h1>KeogoMusika</h1>
+        <h1>Kaion</h1>
         
         <Routes>
           <Route path="/" element={

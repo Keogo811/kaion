@@ -3,48 +3,44 @@ import { Routes, Route } from 'react-router-dom';
 import { AudioPlayer } from '../features/player';
 import { SongList, SongDetails } from '../features/library';
 import { mockSongs } from '../features/library/data';
-import { useColorPalette } from 'color-peek'; // On importe le hook
+import { useColorPalette } from 'color-peek';
 import './App.css';
 
 function App() {
   const [currentSong, setCurrentSong] = useState(mockSongs[0]);
-  
-  // On utilise le hook pour extraire la palette de la chanson en cours
-  const { colors, loading, error, extract } = useColorPalette();
+  const { colors, extract } = useColorPalette();
 
-  // On déclenche l'extraction quand la chanson change
   useEffect(() => {
     if (currentSong?.image) {
       extract({ src: currentSong.image });
     }
   }, [currentSong, extract]);
 
-  // Détermination du thème de secours (fallback)
-  // Si on a des couleurs, on utilise la première. Sinon, on garde 'dark'.
-  let currentTheme = 'dark'; // Thème par défaut
-  if (colors && colors.length > 0) {
-    // On convertit la couleur RGB en une chaîne CSS
-    const [r, g, b] = colors[0].color;
-    currentTheme = `rgb(${r}, ${g}, ${b})`;
+  // DÉCOR : Fallback par défaut (Noir profond vers Gris très sombre)
+  let backgroundStyle = 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)';
+  
+  // Si l'image existe ET qu'on a des couleurs, on crée le dégradé
+  if (currentSong?.image && colors && colors.length > 0) {
+    const [r1, g1, b1] = colors[0].color;
+    // Pour un contraste garanti, la 2ème couleur sera TOUJOURS un noir profond
+    backgroundStyle = `linear-gradient(135deg, rgb(${r1}, ${g1}, ${b1}) 0%, #111111 100%)`;
   }
 
   return (
-    // On applique le style dynamique ici
+    // La "key" force React à recréer le composant si on change de chanson, réinitialisant le fond
     <div 
+      key={currentSong.id} 
       className="app-container" 
-      style={{ 
-        backgroundColor: currentTheme,
-        // On ajuste la couleur du texte pour qu'il reste lisible
-        color: currentTheme === 'dark' ? '#ffffff' : '#1a1a1a' 
-      }}
+      style={{ background: backgroundStyle }}
     >
-      <main className="main-content">
-        <h1>Kaion</h1>
+      
+      <main className="main-content" style={{ color: '#ffffff' }}>
+        <h1 style={{ textShadow: '0px 2px 8px rgba(0,0,0,0.8)' }}>Kaion</h1>
         
         <Routes>
           <Route path="/" element={
             <>
-              <p>Bienvenue sur la future plateforme musicale.</p>
+              <p style={{ opacity: 0.9, textShadow: '0px 1px 4px rgba(0,0,0,0.8)' }}>Bienvenue sur la plateforme musicale.</p>
               <SongList onSongSelect={setCurrentSong} />
             </>
           } />

@@ -1,9 +1,9 @@
 import { useParams, Link } from 'react-router-dom';
-import { mockSongs } from './data';
 
-function SongDetails() {
+function SongDetails({ songs }) { // On reçoit "songs" en prop
   const { id } = useParams();
-  const song = mockSongs.find((s) => s.id === id);
+  // On cherche la chanson dans les props au lieu d'importer mockSongs
+  const song = songs.find((s) => s.id === id);
 
   if (!song) return <h2>Chanson introuvable</h2>;
 
@@ -31,14 +31,8 @@ function SongDetails() {
       <div style={{ marginTop: '2rem', padding: '1.5rem', backgroundColor: 'rgba(0, 0, 0, 0.5)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)' }}>
         <h4 style={{ textShadow: '0px 1px 3px rgba(0,0,0,0.8)' }}>Paroles :</h4>
         
-        {/* Affichage conditionnel des paroles */}
         {song.lyrics ? (
-          <p style={{ 
-            whiteSpace: 'pre-wrap', // TRÈS IMPORTANT : Permet de garder les sauts de ligne du texte
-            lineHeight: '1.6',
-            fontSize: '1.1rem',
-            textShadow: '0px 1px 3px rgba(0,0,0,0.8)'
-          }}>
+          <p style={{ whiteSpace: 'pre-wrap', lineHeight: '1.6', fontSize: '1.1rem', textShadow: '0px 1px 3px rgba(0,0,0,0.8)' }}>
             {song.lyrics}
           </p>
         ) : (

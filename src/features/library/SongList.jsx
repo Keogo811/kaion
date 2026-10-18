@@ -11,17 +11,16 @@ function SongList({ onSongSelect }) {
             key={song.id} 
             style={{ 
               padding: '1rem', 
-              backgroundColor: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
               marginBottom: '0.5rem',
               borderRadius: '8px',
               display: 'flex',
               alignItems: 'center',
-              gap: '1rem' // Espace entre l'image et le texte
+              gap: '1rem'
             }}
           >
-            {/* L'image de la chanson (avec un fallback si absente) */}
-            <div style={{ width: '60px', height: '60px', borderRadius: '8px', overflow: 'hidden', backgroundColor: '#ccc', flexShrink: 0 }}>
+            <div style={{ width: '60px', height: '60px', borderRadius: '8px', overflow: 'hidden', backgroundColor: '#333', flexShrink: 0 }}>
               {song.image ? (
                 <img src={song.image} alt={song.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
@@ -29,13 +28,12 @@ function SongList({ onSongSelect }) {
               )}
             </div>
 
-            {/* Le texte et le bouton */}
             <Link 
               to={`/song/${song.id}`} 
-              style={{ textDecoration: 'none', color: 'inherit', flex: 1 }}
+              style={{ textDecoration: 'none', color: '#ffffff', flex: 1 }} // Texte forcé en blanc
             >
-              <strong style={{ fontSize: '1.2rem', display: 'block' }}>{song.title}</strong>
-              <span style={{ fontSize: '0.9rem', opacity: 0.7 }}>{song.artist}</span>
+              <strong style={{ fontSize: '1.2rem', display: 'block', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>{song.title}</strong>
+              <span style={{ fontSize: '0.9rem', opacity: 0.8 }}>{song.artist}</span>
             </Link>
 
             <button 

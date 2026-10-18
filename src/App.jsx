@@ -16,30 +16,31 @@ function App() {
     }
   }, [currentSong, extract]);
 
-  // Gestion du décor (Background)
-  let backgroundStyle = 'linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)'; // Thème par défaut (dégradé sombre)
+  // DÉCOR : On vérifie strictement si la chanson a une image ET si on a des couleurs
+  let backgroundStyle = 'linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)'; // Fallback
   
-  if (colors && colors.length > 0) {
-    const [r1, g1, b1] = colors[0].color; // Couleur dominante
-    // Si on a une deuxième couleur, on l'utilise, sinon on éclaircit la première
-    const color2 = colors[1] ? colors[1].color : [r1 + 30, g1 + 30, b1 + 30];
-    const [r2, g2, b2] = color2;
+  if (currentSong?.image && colors && colors.length > 0) {
+    const [r1, g1, b1] = colors[0].color;
+    
+    // On force un contraste : la 2ème couleur sera 40% plus sombre que la 1ère
+    const r2 = Math.floor(r1 * 0.4);
+    const g2 = Math.floor(g1 * 0.4);
+    const b2 = Math.floor(b1 * 0.4);
 
-    // Création du dégradé dynamique
     backgroundStyle = `linear-gradient(135deg, rgb(${r1}, ${g1}, ${b1}) 0%, rgb(${r2}, ${g2}, ${b2}) 100%)`;
   }
 
   return (
-    // On applique le dégradé en style inline
-    <div className="app-container" style={{ background: backgroundStyle }}>
+    // On force le texte en blanc sur le conteneur principal
+    <div className="app-container" style={{ background: backgroundStyle, color: '#ffffff' }}>
       
-      <main className="main-content" style={{ color: '#ffffff' }}> {/* On force le texte en blanc pour la lisibilité sur fond coloré */}
-        <h1>Kaion</h1>
+      <main className="main-content">
+        <h1 style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>Kaion</h1>
         
         <Routes>
           <Route path="/" element={
             <>
-              <p style={{ opacity: 0.8 }}>Bienvenue sur la plateforme musicale.</p>
+              <p style={{ opacity: 0.9, textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>Bienvenue sur la plateforme musicale.</p>
               <SongList onSongSelect={setCurrentSong} />
             </>
           } />

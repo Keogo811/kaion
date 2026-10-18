@@ -58,7 +58,7 @@ function AudioPlayer({ src }) {
   };
 
   return (
-    <div style={{ padding: '1rem', border: '1px solid #ccc', borderRadius: '8px', maxWidth: '400px', backgroundColor: '#f9f9f9' }}>
+    <div style={{ padding: '1rem', width: '100%', maxWidth: '600px', margin: '0 auto' }}>
       
       {/* L'élément audio invisible qui fait le travail */}
       <audio 

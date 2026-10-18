@@ -1,13 +1,18 @@
+/* Le conteneur principal qui prend tout l'écran */
 .app-container {
   min-height: 100vh;
-  position: relative;
+  transition: background-color 0.5s ease, color 0.5s ease; /* Transition douce */
 }
 
+/* Le contenu de la page */
 .main-content {
   padding: 2rem;
-  padding-bottom: 150px; /* Laisse de la place pour ne pas cacher le texte derrière la barre */
+  padding-bottom: 150px;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
+/* La barre du lecteur en bas */
 .bottom-player-bar {
   position: fixed;
   bottom: 0;
@@ -19,3 +24,31 @@
   display: flex;
   justify-content: center;
 }
+
+/* =========================================
+   NOS THÈMES GRAPHIQUES
+   ========================================= */
+
+/* Thème par défaut (sombre) */
+.theme-dark {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+.theme-dark .main-content { color: #ffffff; }
+.theme-dark a { color: #4dabf7 !important; }
+
+/* Thème Néon */
+.theme-neon {
+  background-color: #0d0221;
+  color: #ff00ff;
+}
+.theme-neon .main-content { color: #00ffff; }
+.theme-neon a { color: #ff00ff !important; }
+
+/* Thème Rétro */
+.theme-retro {
+  background-color: #f4ecd8;
+  color: #5b4636;
+}
+.theme-retro .main-content { color: #5b4636; }
+.theme-retro a { color: #8b5a2b !important; }

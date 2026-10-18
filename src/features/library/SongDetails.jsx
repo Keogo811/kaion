@@ -16,7 +16,7 @@ function SongDetails() {
       <h2>{song.title}</h2>
       <h3 style={{ color: '#666' }}>{song.artist}</h3>
       
-      <div style={{ marginTop: '2rem', padding: '1rem', backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
+      <div style={{ marginTop: '2rem', padding: '1rem', backgroundColor: 'rgba(128, 128, 128, 0.2)', borderRadius: '8px' }}>
         <h4>Paroles :</h4>
         <p><em>Les paroles de cette chanson seront disponibles plus tard.</em></p>
       </div>

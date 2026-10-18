@@ -11,7 +11,6 @@ function App() {
   const [songs, setSongs] = useState([]);
   const [currentSong, setCurrentSong] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  
   const { colors, extract } = useColorPalette();
 
   useEffect(() => {
@@ -31,23 +30,41 @@ function App() {
 
   const addSong = async (newSong) => {
     try {
-      // On ajoute la colonne tags dans la requête SQL
       await sql`
         INSERT INTO songs (id, title, artist, url, image, lyrics, theme, tags) 
         VALUES (${newSong.id}, ${newSong.title}, ${newSong.artist}, ${newSong.url}, ${newSong.image}, ${newSong.lyrics}, ${newSong.theme}, ${newSong.tags})
       `;
       setSongs((prev) => [...prev, newSong]);
       if (!currentSong) setCurrentSong(newSong);
-    } catch (error) {
-      console.error("Erreur d'ajout :", error);
-      alert("Impossible d'ajouter la chanson.");
-    }
+    } catch (error) { console.error(error); alert("Erreur d'ajout."); }
+  };
+
+  // NOUVEAU : Mettre à jour une chanson
+  const updateSong = async (updatedSong) => {
+    try {
+      await sql`
+        UPDATE songs 
+        SET title = ${updatedSong.title}, artist = ${updatedSong.artist}, url = ${updatedSong.url}, tags = ${updatedSong.tags}
+        WHERE id = ${updatedSong.id}
+      `;
+      setSongs((prev) => prev.map((s) => (s.id === updatedSong.id ? updatedSong : s)));
+      if (currentSong?.id === updatedSong.id) setCurrentSong(updatedSong);
+    } catch (error) { console.error(error); alert("Erreur de modification."); }
+  };
+
+  // NOUVEAU : Supprimer une chanson
+  const deleteSong = async (id) => {
+    try {
+      await sql`DELETE FROM songs WHERE id = ${id}`;
+      setSongs((prev) => prev.filter((s) => s.id !== id));
+      if (currentSong?.id === id) {
+        setCurrentSong(songs.find(s => s.id !== id) || null);
+      }
+    } catch (error) { console.error(error); alert("Erreur de suppression."); }
   };
 
   useEffect(() => {
-    if (currentSong?.image) {
-      extract({ src: currentSong.image });
-    }
+    if (currentSong?.image) extract({ src: currentSong.image });
   }, [currentSong, extract]);
 
   let backgroundStyle = 'linear-gradient(135deg, #1a1a1a 0%, #000000 100%)';
@@ -65,7 +82,7 @@ function App() {
         <Routes>
           <Route path="/" element={
             <>
-              <p style={{ opacity: 0.9, textShadow: '0px 1px 4px rgba(0,0,0,0.8)' }}>Bienvenue sur la plateforme musicale.</p>
+              <p style={{ opacity: 0.9, textShadow: '0px 1px 4px rgba(0,0,0,0.8)' }}>Bienvenue sur Kaion.</p>
               <SongList songs={songs} onSongSelect={setCurrentSong} />
               <div style={{ marginTop: '3rem', textAlign: 'center' }}>
                 <a href="/admin" style={{ color: '#aaa', fontSize: '0.8rem', textDecoration: 'underline' }}>Accès Admin</a>
@@ -73,7 +90,14 @@ function App() {
             </>
           } />
           <Route path="/song/:id" element={<SongDetails songs={songs} />} />
-          <Route path="/admin" element={<AdminPage onAddSong={addSong} />} />
+          <Route path="/admin" element={
+            <AdminPage 
+              songs={songs} 
+              onAddSong={addSong} 
+              onUpdateSong={updateSong} 
+              onDeleteSong={deleteSong} 
+            />
+          } />
         </Routes>
       </main>
       <div className="bottom-player-bar">

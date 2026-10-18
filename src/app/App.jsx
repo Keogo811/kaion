@@ -1,8 +1,12 @@
+import { useState } from 'react';
 import { AudioPlayer } from '../features/player';
-import './App.css'; // On importe notre nouveau fichier CSS
+import { SongList } from '../features/library';
+import { mockSongs } from '../features/library/data'; // On importe les données pour la chanson par défaut
+import './App.css';
 
 function App() {
-  const testAudioUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+  // L'état qui retient la chanson en cours (on initialise avec la première)
+  const [currentSong, setCurrentSong] = useState(mockSongs[0]);
 
   return (
     <div className="app-container">
@@ -10,16 +14,18 @@ function App() {
         <h1>KeogoMusika</h1>
         <p>Bienvenue sur la future plateforme musicale.</p>
         
-        {/* Un faux contenu pour pouvoir tester le défilement (scroll) */}
-        <div style={{ height: '150vh', backgroundColor: '#e0e0e0', marginTop: '2rem', padding: '2rem', borderRadius: '8px' }}>
-          <h2>Fais défiler vers le bas</h2>
-          <p>La barre de musique doit rester fixée tout en bas de l'écran, même quand tu scrolles.</p>
+        {/* On donne la fonction setCurrentSong à la liste */}
+        <SongList onSongSelect={setCurrentSong} />
+        
+        <div style={{ marginTop: '2rem', padding: '1rem', backgroundColor: '#fff', borderRadius: '8px' }}>
+          <h3>En cours de lecture :</h3>
+          <p>{currentSong.title} — {currentSong.artist}</p>
         </div>
       </main>
 
-      {/* Notre barre permanente en bas */}
+      {/* On donne la chanson actuelle au lecteur */}
       <div className="bottom-player-bar">
-        <AudioPlayer src={testAudioUrl} />
+        <AudioPlayer src={currentSong.url} />
       </div>
     </div>
   );

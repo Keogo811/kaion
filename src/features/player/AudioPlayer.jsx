@@ -6,19 +6,28 @@ function AudioPlayer({ src }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(1); // 1 = 100%
+  const [volume, setVolume] = useState(1);
 
-  // Met à jour le temps écoulé pendant la lecture
+  // Si la source (src) change, on réinitialise le lecteur
+  useEffect(() => {
+    setIsPlaying(false);
+    setCurrentTime(0);
+    setDuration(0);
+    if (audioRef.current) {
+      audioRef.current.load(); // Force le navigateur à recharger la nouvelle source
+    }
+  }, [src]);
+
   const handleTimeUpdate = () => {
     setCurrentTime(audioRef.current.currentTime);
   };
 
-  // Récupère la durée totale quand la musique est chargée
   const handleLoadedMetadata = () => {
     setDuration(audioRef.current.duration);
+    // Optionnel : lancer la musique automatiquement au changement
+    // audioRef.current.play(); setIsPlaying(true);
   };
 
-  // Quand la musique se termine, on remet le bouton sur Play
   const handleEnded = () => {
     setIsPlaying(false);
     setCurrentTime(0);
@@ -26,7 +35,6 @@ function AudioPlayer({ src }) {
 
   const togglePlay = () => {
     if (!audioRef.current) return;
-
     if (isPlaying) {
       audioRef.current.pause();
     } else {
@@ -35,21 +43,18 @@ function AudioPlayer({ src }) {
     setIsPlaying(!isPlaying);
   };
 
-  // Déplacer le curseur pour avancer/reculer dans la chanson
   const handleSeek = (e) => {
     const time = Number(e.target.value);
     audioRef.current.currentTime = time;
     setCurrentTime(time);
   };
 
-  // Changer le volume
   const handleVolumeChange = (e) => {
     const newVolume = Number(e.target.value);
     audioRef.current.volume = newVolume;
     setVolume(newVolume);
   };
 
-  // Formate le temps en minutes:secondes (ex: 03:45)
   const formatTime = (timeInSeconds) => {
     if (isNaN(timeInSeconds)) return "0:00";
     const minutes = Math.floor(timeInSeconds / 60);
@@ -59,8 +64,6 @@ function AudioPlayer({ src }) {
 
   return (
     <div style={{ padding: '1rem', width: '100%', maxWidth: '600px', margin: '0 auto' }}>
-      
-      {/* L'élément audio invisible qui fait le travail */}
       <audio 
         ref={audioRef} 
         src={src} 
@@ -70,46 +73,20 @@ function AudioPlayer({ src }) {
         onEnded={handleEnded}
       />
 
-      {/* Bouton Play/Pause */}
-      <button 
-        onClick={togglePlay} 
-        style={{ padding: '0.5rem 1rem', fontSize: '1rem', cursor: 'pointer', marginBottom: '1rem' }}
-      >
+      <button onClick={togglePlay} style={{ padding: '0.5rem 1rem', fontSize: '1rem', cursor: 'pointer', marginBottom: '1rem' }}>
         {isPlaying ? '⏸ Pause' : '▶ Play'}
       </button>
 
-      {/* Barre de progression */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
-        <span style={{ fontSize: '0.8rem', color: '#666', width: '35px' }}>
-          {formatTime(currentTime)}
-        </span>
-        <input 
-          type="range" 
-          min="0" 
-          max={duration || 0} 
-          value={currentTime} 
-          onChange={handleSeek}
-          style={{ flex: 1, cursor: 'pointer' }}
-        />
-        <span style={{ fontSize: '0.8rem', color: '#666', width: '35px' }}>
-          {formatTime(duration)}
-        </span>
+        <span style={{ fontSize: '0.8rem', color: '#666', width: '35px' }}>{formatTime(currentTime)}</span>
+        <input type="range" min="0" max={duration || 0} value={currentTime} onChange={handleSeek} style={{ flex: 1, cursor: 'pointer' }} />
+        <span style={{ fontSize: '0.8rem', color: '#666', width: '35px' }}>{formatTime(duration)}</span>
       </div>
 
-      {/* Contrôle du volume */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         <span style={{ fontSize: '1rem' }}>🔊</span>
-        <input 
-          type="range" 
-          min="0" 
-          max="1" 
-          step="0.01" 
-          value={volume} 
-          onChange={handleVolumeChange}
-          style={{ flex: 1, cursor: 'pointer' }}
-        />
+        <input type="range" min="0" max="1" step="0.01" value={volume} onChange={handleVolumeChange} style={{ flex: 1, cursor: 'pointer' }} />
       </div>
-
     </div>
   );
 }

@@ -11,8 +11,6 @@ function App() {
   const [songs, setSongs] = useState([]);
   const [currentSong, setCurrentSong] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Nouveaux états pour le lecteur
   const [isShuffle, setIsShuffle] = useState(false);
   const [isRepeat, setIsRepeat] = useState(false);
 
@@ -24,32 +22,26 @@ function App() {
         const data = await sql`SELECT * FROM songs ORDER BY created_at ASC`;
         setSongs(data);
         if (data.length > 0) setCurrentSong(data[0]);
-      } catch (error) {
-        console.error("Erreur de chargement :", error);
-      } finally {
-        setIsLoading(false);
-      }
+      } catch (error) { console.error(error); } finally { setIsLoading(false); }
     }
     fetchSongs();
   }, []);
 
-  const addSong = async (newSong) => { /* ... (inchangé) ... */ 
+  const addSong = async (newSong) => { /* inchangé */
     try {
       await sql`INSERT INTO songs (id, title, artist, url, image, lyrics, theme, tags) VALUES (${newSong.id}, ${newSong.title}, ${newSong.artist}, ${newSong.url}, ${newSong.image}, ${newSong.lyrics}, ${newSong.theme}, ${newSong.tags})`;
       setSongs((prev) => [...prev, newSong]);
       if (!currentSong) setCurrentSong(newSong);
     } catch (error) { console.error(error); }
   };
-
-  const updateSong = async (updatedSong) => { /* ... (inchangé) ... */ 
+  const updateSong = async (updatedSong) => { /* inchangé */
     try {
       await sql`UPDATE songs SET title = ${updatedSong.title}, artist = ${updatedSong.artist}, url = ${updatedSong.url}, tags = ${updatedSong.tags} WHERE id = ${updatedSong.id}`;
       setSongs((prev) => prev.map((s) => (s.id === updatedSong.id ? updatedSong : s)));
       if (currentSong?.id === updatedSong.id) setCurrentSong(updatedSong);
     } catch (error) { console.error(error); }
   };
-
-  const deleteSong = async (id) => { /* ... (inchangé) ... */ 
+  const deleteSong = async (id) => { /* inchangé */
     try {
       await sql`DELETE FROM songs WHERE id = ${id}`;
       setSongs((prev) => prev.filter((s) => s.id !== id));
@@ -57,33 +49,23 @@ function App() {
     } catch (error) { console.error(error); }
   };
 
-  // NOUVEAU : Chanson suivante
   const handleNext = () => {
     if (!currentSong || songs.length === 0) return;
-
     if (isShuffle) {
-      // Aléatoire : on prend une chanson au hasard (différente de l'actuelle si possible)
-      const randomIndex = Math.floor(Math.random() * songs.length);
-      setCurrentSong(songs[randomIndex]);
+      setCurrentSong(songs[Math.floor(Math.random() * songs.length)]);
     } else {
-      // Normal : on passe à la suivante
       const currentIndex = songs.findIndex(s => s.id === currentSong.id);
-      const nextIndex = (currentIndex + 1) % songs.length; // Revient à 0 si on est à la fin
-      setCurrentSong(songs[nextIndex]);
+      setCurrentSong(songs[(currentIndex + 1) % songs.length]);
     }
   };
 
-  // NOUVEAU : Chanson précédente
   const handlePrev = () => {
     if (!currentSong || songs.length === 0) return;
-
     if (isShuffle) {
-      const randomIndex = Math.floor(Math.random() * songs.length);
-      setCurrentSong(songs[randomIndex]);
+      setCurrentSong(songs[Math.floor(Math.random() * songs.length)]);
     } else {
       const currentIndex = songs.findIndex(s => s.id === currentSong.id);
-      const prevIndex = (currentIndex - 1 + songs.length) % songs.length; // Revient à la fin si on est au début
-      setCurrentSong(songs[prevIndex]);
+      setCurrentSong(songs[(currentIndex - 1 + songs.length) % songs.length]);
     }
   };
 
@@ -128,6 +110,9 @@ function App() {
             onToggleShuffle={() => setIsShuffle(!isShuffle)}
             isRepeat={isRepeat}
             onToggleRepeat={() => setIsRepeat(!isRepeat)}
+            songs={songs} // <-- NOUVEAU : On passe la liste
+            currentSong={currentSong} // <-- NOUVEAU
+            onSongSelect={setCurrentSong} // <-- NOUVEAU
           />
         ) : (
           <div style={{ padding: '1rem', color: '#333' }}>Aucune chanson.</div>

@@ -110,9 +110,9 @@ function App() {
             onToggleShuffle={() => setIsShuffle(!isShuffle)}
             isRepeat={isRepeat}
             onToggleRepeat={() => setIsRepeat(!isRepeat)}
-            songs={songs} // <-- NOUVEAU : On passe la liste
-            currentSong={currentSong} // <-- NOUVEAU
-            onSongSelect={setCurrentSong} // <-- NOUVEAU
+            songs={songs}
+            currentSong={currentSong}
+            onSongSelect={setCurrentSong}
           />
         ) : (
           <div style={{ padding: '1rem', color: '#333' }}>Aucune chanson.</div>

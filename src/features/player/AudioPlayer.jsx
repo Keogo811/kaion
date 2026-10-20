@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 
 function AudioPlayer({ 
   src, onNext, onPrev, isShuffle, onToggleShuffle, isRepeat, onToggleRepeat,
-  songs, currentSong, onSongSelect // Nouvelles props
+  songs, currentSong, onSongSelect 
 }) {
   const audioRef = useRef(null);
   
@@ -10,7 +10,7 @@ function AudioPlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
-  const [isQueueOpen, setIsQueueOpen] = useState(false); // État du tiroir
+  const [isQueueOpen, setIsQueueOpen] = useState(false);
 
   useEffect(() => {
     setIsPlaying(false);
@@ -88,14 +88,18 @@ function AudioPlayer({
           onEnded={handleEnded}
         />
 
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.8rem' }}>
           
-          {/* NOUVEAU : Bouton File d'attente */}
-          <button onClick={() => setIsQueueOpen(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#333' }} title="File d'attente">
+          {/* BOUTON FILE D'ATTENTE : Maintenant visible avec un fond gris clair */}
+          <button 
+            onClick={() => setIsQueueOpen(true)} 
+            style={{ backgroundColor: '#e0e0e0', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#333', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} 
+            title="File d'attente"
+          >
             ☰
           </button>
 
-          <button onClick={onToggleShuffle} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: isShuffle ? '#007bff' : '#888' }} title="Aléatoire">🔀</button>
+          <button onClick={onToggleShuffle} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: isShuffle ? '#ff8c00' : '#888' }} title="Aléatoire">🔀</button>
           <button onClick={onPrev} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#333' }} title="Précédent">⏮</button>
           
           <button onClick={togglePlay} style={{ padding: '0.5rem 1rem', fontSize: '1.2rem', cursor: 'pointer', backgroundColor: '#333', color: '#fff', border: 'none', borderRadius: '50%', width: '50px', height: '50px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -103,7 +107,7 @@ function AudioPlayer({
           </button>
           
           <button onClick={onNext} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: '#333' }} title="Suivant">⏭</button>
-          <button onClick={onToggleRepeat} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: isRepeat ? '#007bff' : '#888' }} title="Boucle">🔁</button>
+          <button onClick={onToggleRepeat} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', color: isRepeat ? '#ff8c00' : '#888' }} title="Boucle">🔁</button>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>

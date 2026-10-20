@@ -34,12 +34,16 @@ function App() {
       if (!currentSong) setCurrentSong(newSong);
     } catch (error) { console.error(error); }
   };
-  const updateSong = async (updatedSong) => { /* inchangé */
+  const updateSong = async (updatedSong) => {
     try {
-      await sql`UPDATE songs SET title = ${updatedSong.title}, artist = ${updatedSong.artist}, url = ${updatedSong.url}, tags = ${updatedSong.tags} WHERE id = ${updatedSong.id}`;
+      await sql`
+        UPDATE songs 
+        SET title = ${updatedSong.title}, artist = ${updatedSong.artist}, url = ${updatedSong.url}, tags = ${updatedSong.tags}, lyrics = ${updatedSong.lyrics}, image = ${updatedSong.image}
+        WHERE id = ${updatedSong.id}
+      `;
       setSongs((prev) => prev.map((s) => (s.id === updatedSong.id ? updatedSong : s)));
       if (currentSong?.id === updatedSong.id) setCurrentSong(updatedSong);
-    } catch (error) { console.error(error); }
+    } catch (error) { console.error(error); alert("Erreur de modification."); }
   };
   const deleteSong = async (id) => { /* inchangé */
     try {
